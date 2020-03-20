@@ -18,110 +18,101 @@ app.config.from_object(__name__)
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-# Database (Mock)
-# BOOKS = [
-#     {
-#         'id': uuid.uuid4().hex,
-#         'title': 'On the Road',
-#         'author': 'Jack Kerouac',
-#         'read': True
-#     },
-#     {
-#         'id': uuid.uuid4().hex,
-#         'title': 'Harry Potter and the Philosopher\'s Stone',
-#         'author': 'J. K. Rowling',
-#         'read': False
-#     },
-#     {
-#         'id': uuid.uuid4().hex,
-#         'title': 'Green Eggs and Ham',
-#         'author': 'Dr. Seuss',
-#         'read': True
-#     }
-# ]
-
 db = TinyDB('./database.json')
-# db.insert_multiple([
-#     {
-#         'id': uuid.uuid4().hex,
-#         'title': 'On the Road',
-#         'author': 'Jack Kerouac',
-#         'read': True
-#     },
-#     {
-#         'id': uuid.uuid4().hex,
-#         'title': 'Harry Potter and the Philosopher\'s Stone',
-#         'author': 'J. K. Rowling',
-#         'read': False
-#     },
-#     {
-#         'id': uuid.uuid4().hex,
-#         'title': 'Green Eggs and Ham',
-#         'author': 'Dr. Seuss',
-#         'read': True
-#     }
-# ])
 
 # Main app route
-@app.route('/books', methods=['GET', 'POST'])
-def all_books():
+@app.route('/requests', methods=['GET', 'POST'])
+def all_requests():
     response_object = {'status': 'success'}
     if request.method == 'POST':
         post_data = request.get_json()
-        # BOOKS.append({
-        #     'id': uuid.uuid4().hex,
-        #     'title': post_data.get('title'),
-        #     'author': post_data.get('author'),
-        #     'read': post_data.get('read')
-        # })
+        for i in post_data:
+            print(post_data.get(i))
         db.insert({
             'id': uuid.uuid4().hex,
-            'title': post_data.get('title'),
-            'author': post_data.get('author'),
-            'read': post_data.get('read')
+            'request': post_data.get('request'),
+            'parentGuardian': post_data.get('parentGuardian'),
+            'needHelp': post_data.get('needHelp'),
+            'canHelp': post_data.get('canHelp')
         })
-        response_object['message'] = 'Book added!'
+        response_object['message'] = 'Response added!'
     else:
-        # response_object['books'] = BOOKS
-        response_object['books'] = db.all()
+        response_object['requests'] = db.all()
     return jsonify(response_object)
 
 # Delete\Update api handler
-@app.route('/books/<book_id>', methods=['PUT', 'DELETE'])
-def single_book(book_id):
+@app.route('/requests/<request_id>', methods=['PUT', 'DELETE'])
+def single_request(request_id):
     response_object = {'status': 'success'}
     if request.method == 'PUT':
         post_data = request.get_json()
-        remove_book(book_id)
-        # BOOKS.append({
-        #     'id': uuid.uuid4().hex,
-        #     'title': post_data.get('title'),
-        #     'author': post_data.get('author'),
-        #     'read': post_data.get('read')
-        # })
+        remove_request(request_id)
+        print("id: ")
+        print("request: {}".format(post_data.get('request')))
+        print("parentGuardian: {}".format(post_data.get('parentGuardian')))
+        print("needHelp: {}".format(post_data.get('needHelp')))
+        print("canHelp: {}".format(post_data.get('canHelp')))
         db.insert({
             'id': uuid.uuid4().hex,
-            'title': post_data.get('title'),
-            'author': post_data.get('author'),
-            'read': post_data.get('read')
+            'request': post_data.get('request'),
+            'parentGuardian': post_data.get('parentGuardian'),
+            'needHelp': post_data.get('needHelp'),
+            'canHelp': post_data.get('canHelp')
         })
-        response_object['message'] = 'Book updated!'
+        response_object['message'] = 'Response updated!'
     if request.method == 'DELETE':
-        remove_book(book_id)
-        response_object['message'] = 'Book removed!'
+        remove_request(request_id)
+        response_object['message'] = 'Response removed!'
     return jsonify(response_object)
 
 # Helper for the update api
-def remove_book(book_id):
-    # for book in BOOKS:
-    #     if book['id'] == book_id:
-    #         BOOKS.remove(book)
-    #         return True
-    for book in db:
-        if book['id'] == book_id:
-            db.remove(Query().id == book_id)
+def remove_request(request_id):
+    for request in db:
+        if request['id'] == request_id:
+            db.remove(Query().id == request_id)
             return True
     return False
+
+# Helper for clearing and reloading the db
+def recreate_db():
+    # Base
+    import uuid
+
+    # Flask
+    from flask import Flask, jsonify, request
+    from flask_cors import CORS
+
+    # DB
+    from tinydb import TinyDB, Query
+
+    db = TinyDB('./database.json')
+    db.purge()
+    db.insert_multiple([
+        {
+            'id': uuid.uuid4().hex,
+            'request': 'Lack of diapers in my area, can anyone help?',
+            'parentGuardian': 'Jack Kerouac',
+            'needHelp': False,
+            'canHelp': False,
+        },
+        {
+            'id': uuid.uuid4().hex,
+            'request': 'Can someone watch my kid from 2-3pm tomorrow?',
+            'parentGuardian': 'J. K. Rowling',
+            'needHelp': False,
+            'canHelp': False
+
+        },
+        {
+            'id': uuid.uuid4().hex,
+            'request': 'I need a baby sitter this Friday (3/20/2020) from 1-2pm/ Is anyone available?',
+            'parentGuardian': 'Ben B',
+            'needHelp': False,
+            'canHelp': False
+        }
+    ])
+
+
 
 # sanity check route
 @app.route('/ping', methods=['GET'])
@@ -129,5 +120,6 @@ def ping_pong():
     return jsonify('pong!')
 
 
+
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')

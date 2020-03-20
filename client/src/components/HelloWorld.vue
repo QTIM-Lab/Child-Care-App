@@ -1,47 +1,59 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div class="container">
+    <!-- NavBar -->
+    <NavBar></NavBar>
+    <!-- <div class="jumbotron">
+    </div> -->
+    <BJumbotron>
+      <img src="../assets/background-image.jpg" class="img-fluid" alt="">
+    </BJumbotron>
+    <div class="row">
+      <h1>Child Care and Misc. Resources</h1>
+      <!-- <p>Use this <i>mymaps</i> map to add a location for your </p> -->
+      <iframe src="https://www.google.com/maps/d/u/1/embed?mid=1JsA5_X7Kk0ejNZvo1hOJPRL9bPnCq_eh" width="100%" height="480"></iframe>
+    </div>
+    <br>
+    <ChildCareRequests></ChildCareRequests>
+    <br>
+    <br>
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc607Obx7cgTqDECsR9wO280rucBdnyCH_PibUeLrVh2CPRmg/viewform?embedded=true" width="640" height="1517" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
   </div>
 </template>
 
 <script>
+// import Parallax from 'vue-parallaxy';
+import { BJumbotron } from 'bootstrap-vue';
+import ChildCareRequests from './ChildCareRequests.vue';
+import NavBar from './NavBar.vue';
+
+
 export default {
   name: 'HelloWorld',
   props: {
     msg: String,
+  },
+  components: {
+    ChildCareRequests,
+    NavBar,
+    BJumbotron,
+    // Parallax,
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
+/* h3 {
   margin: 40px 0 0;
 }
 ul {
@@ -54,5 +66,27 @@ li {
 }
 a {
   color: #42b983;
+} */
+
+body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0 0 0 0;
+  background-color: #f3f3f3; }
+
+h1 {
+  color: #000;
+  /* From Google Fonts */
+  /* margin: auto; */
+  /* width: 50%; */
+  line-height: 75px;
+  display: inline;
+  /* font-size: xxx-large; */
+  text-align: left;
+  /* font-family: 'Odibee Sans'; */
+}
+
+p {
+  display: block;
 }
 </style>

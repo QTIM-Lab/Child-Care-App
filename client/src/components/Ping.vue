@@ -11,12 +11,12 @@ export default {
   name: 'Ping',
   data() {
     return {
-      msg: '',
+      msg: 'From data() in Ping.vue',
     };
   },
   methods: {
     getMessage() {
-      const path = 'http://localhost:5000/ping';
+      const path = 'http://172.21.14.152:5000/ping';
       axios.get(path)
         .then((res) => {
           this.msg = res.data;
