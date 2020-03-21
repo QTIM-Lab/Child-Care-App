@@ -4,9 +4,9 @@
     <NavBar></NavBar>
     <!-- <div class="jumbotron">
     </div> -->
-    <BJumbotron>
+    <!-- <BJumbotron>
       <img src="../assets/background-image.jpg" class="img-fluid" alt="">
-    </BJumbotron>
+    </BJumbotron> -->
     <div class="row">
       <h1>Child Care and Misc. Resources</h1>
       <!-- <p>Use this <i>mymaps</i> map to add a location for your </p> -->
@@ -32,7 +32,7 @@
 
 <script>
 // import Parallax from 'vue-parallaxy';
-import { BJumbotron } from 'bootstrap-vue';
+// import { BJumbotron } from 'bootstrap-vue';
 import ChildCareRequests from './ChildCareRequests.vue';
 import NavBar from './NavBar.vue';
 
@@ -45,7 +45,7 @@ export default {
   components: {
     ChildCareRequests,
     NavBar,
-    BJumbotron,
+    // BJumbotron,
     // Parallax,
   },
 };
