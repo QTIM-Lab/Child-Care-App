@@ -4,13 +4,14 @@
     <NavBar></NavBar>
     <!-- <div class="jumbotron">
     </div> -->
-    <!-- <BJumbotron>
-      <img src="../assets/background-image.jpg" class="img-fluid" alt="">
-    </BJumbotron> -->
     <div class="row">
-      <h1>Child Care and Misc. Resources</h1>
-      <!-- <p>Use this <i>mymaps</i> map to add a location for your </p> -->
+      <h1>MGH Community Help</h1>
       <iframe src="https://www.google.com/maps/d/u/1/embed?mid=1JsA5_X7Kk0ejNZvo1hOJPRL9bPnCq_eh" width="100%" height="480"></iframe>
+      <p>Edit this map
+        <a href="https://drive.google.com/open?id=1JsA5_X7Kk0ejNZvo1hOJPRL9bPnCq_eh&usp=sharing">
+        here
+        </a>
+      </p>
     </div>
     <br>
     <ChildCareRequests></ChildCareRequests>
@@ -32,7 +33,6 @@
 
 <script>
 // import Parallax from 'vue-parallaxy';
-// import { BJumbotron } from 'bootstrap-vue';
 import ChildCareRequests from './ChildCareRequests.vue';
 import NavBar from './NavBar.vue';
 
@@ -45,7 +45,6 @@ export default {
   components: {
     ChildCareRequests,
     NavBar,
-    // BJumbotron,
     // Parallax,
   },
 };

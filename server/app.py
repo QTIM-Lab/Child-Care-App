@@ -30,8 +30,12 @@ def all_requests():
             print(post_data.get(i))
         db.insert({
             'id': uuid.uuid4().hex,
+            'name': post_data.get('name'),
+            'email': post_data.get('email'),
+            'address': post_data.get('address'),
+            'lat': post_data.get('lat'),
+            'long': post_data.get('long'),
             'request': post_data.get('request'),
-            'parentGuardian': post_data.get('parentGuardian'),
             'needHelp': post_data.get('needHelp'),
             'canHelp': post_data.get('canHelp')
         })
@@ -48,14 +52,22 @@ def single_request(request_id):
         post_data = request.get_json()
         remove_request(request_id)
         print("id: ")
+        print("name: {}".format(post_data.get('name')))
+        print("email: {}".format(post_data.get('email')))
+        print("address: {}".format(post_data.get('address')))
+        print("lat: {}".format(post_data.get('lat')))
+        print("long: {}".format(post_data.get('long')))
         print("request: {}".format(post_data.get('request')))
-        print("parentGuardian: {}".format(post_data.get('parentGuardian')))
         print("needHelp: {}".format(post_data.get('needHelp')))
         print("canHelp: {}".format(post_data.get('canHelp')))
         db.insert({
             'id': uuid.uuid4().hex,
+            'name': post_data.get('name'),
+            'email': post_data.get('email'),
+            'address': post_data.get('address'),
+            'lat': post_data.get('lat'),
+            'long': post_data.get('long'),
             'request': post_data.get('request'),
-            'parentGuardian': post_data.get('parentGuardian'),
             'needHelp': post_data.get('needHelp'),
             'canHelp': post_data.get('canHelp')
         })
@@ -90,23 +102,35 @@ def recreate_db():
     db.insert_multiple([
         {
             'id': uuid.uuid4().hex,
+            'name': 'Jack Kerouac',
+            'email': 'test@gmail.com',
+            'address': 'Park Drive,Boston, MA',
+            'lat': 42.341590,
+            'long': -71.097740,
             'request': 'Lack of diapers in my area, can anyone help?',
-            'parentGuardian': 'Jack Kerouac',
             'needHelp': False,
             'canHelp': False,
         },
         {
             'id': uuid.uuid4().hex,
+            'name': 'J. K. Rowling',
+            'email': 'test@gmail.com',
+            'address': '23 Aldie St., Allston, MA 02134',
+            'lat': 42.358960,
+            'long': -71.135920,
             'request': 'Can someone watch my kid from 2-3pm tomorrow?',
-            'parentGuardian': 'J. K. Rowling',
             'needHelp': False,
             'canHelp': False
 
         },
         {
             'id': uuid.uuid4().hex,
+            'name': 'Ben B',
+            'email': 'test@gmail.com',
+            'address': '1000 Commonwealth Ave., Boston, MA 02135',
+            'lat': 42.349420,
+            'long': -71.132920,
             'request': 'I need a baby sitter this Friday (3/20/2020) from 1-2pm/ Is anyone available?',
-            'parentGuardian': 'Ben B',
             'needHelp': False,
             'canHelp': False
         }

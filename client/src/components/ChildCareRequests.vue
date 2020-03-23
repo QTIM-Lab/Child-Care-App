@@ -2,18 +2,24 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-10">
-        <h1>Live Child Care Requests</h1>
-        <hr><br><br>
+        <h1>Help Requests</h1>
+        <hr>
+        <br>
+        <rmap v-bind:requests="requests" ref="ourmap"></rmap>
+        <br>
         <alert :message=message v-if="showMessage"></alert>
         <button type="button"
                 class="btn btn-success btn-sm"
-                v-b-modal.request-modal>Add Request</button>
+                v-b-modal.request-modal>Add Request
+        </button>
         <br><br>
         <table class="table table-hover">
           <thead>
             <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Address</th>
               <th scope="col">Request/Service</th>
-              <th scope="col">Parent/Guardian</th>
               <th scope="col">Need Help?</th>
               <th scope="col">Can Help?</th>
               <th></th>
@@ -21,8 +27,10 @@
           </thead>
           <tbody>
             <tr v-for="(request, index) in requests" :key="index">
+              <td>{{ request.name }}</td>
+              <td>{{ request.email }}</td>
+              <td>{{ request.address }}</td>
               <td>{{ request.request }}</td>
-              <td>{{ request.parentGuardian }}</td>
               <td>
                 <span v-if="request.needHelp">Yes</span>
                 <span v-else>No</span>
@@ -58,6 +66,39 @@
             request="Add a new request"
             hide-footer>
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
+        <b-form-group id="form-name-group"
+                      label="Name:"
+                      label-for="form-name-input">
+            <b-form-input id="form-name-input"
+                          type="text"
+                          v-model="addRequestForm.name"
+                          required
+                          placeholder="First Last">
+            </b-form-input>
+        </b-form-group>
+
+        <b-form-group id="form-email-group"
+                      label="Email:"
+                      label-for="form-email-input">
+            <b-form-input id="form-email-input"
+                          type="text"
+                          v-model="addRequestForm.email"
+                          required
+                          placeholder="username@gmail.com">
+            </b-form-input>
+        </b-form-group>
+
+        <b-form-group id="form-address-group"
+                      label="Address:"
+                      label-for="form-address-input">
+            <b-form-input id="form-address-input"
+                          type="text"
+                          v-model="addRequestForm.address"
+                          required
+                          placeholder="123 Pleasant St., Morgantown, WV 26505">
+            </b-form-input>
+        </b-form-group>
+
         <b-form-group id="form-request-group"
                     label="Request:"
                     label-for="form-request-input">
@@ -67,17 +108,6 @@
                         required
                         placeholder="Enter request">
           </b-form-input>
-        </b-form-group>
-
-        <b-form-group id="form-parentGuardian-group"
-                      label="Parent/Guardian:"
-                      label-for="form-parentGuardian-input">
-            <b-form-input id="form-parentGuardian-input"
-                          type="text"
-                          v-model="addRequestForm.parentGuardian"
-                          required
-                          placeholder="Enter parentGuardian">
-            </b-form-input>
         </b-form-group>
 
         <b-form-group id="form-needHelp-group">
@@ -104,6 +134,40 @@
             request="Update"
             hide-footer>
       <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
+
+        <b-form-group id="form-name-edit-group"
+                      label="Name:"
+                      label-for="form-name-edit-input">
+            <b-form-input id="form-name-edit-input"
+                          type="text"
+                          v-model="editForm.name"
+                          required
+                          placeholder="First Last">
+            </b-form-input>
+        </b-form-group>
+
+        <b-form-group id="form-email-edit-group"
+                    label="Email:"
+                    label-for="form-email-edit-input">
+          <b-form-input id="form-email-edit-input"
+                        type="text"
+                        v-model="editForm.email"
+                        required
+                        placeholder="username@gmail.com">
+          </b-form-input>
+        </b-form-group>
+
+        <b-form-group id="form-address-edit-group"
+                    label="Address:"
+                    label-for="form-address-edit-input">
+          <b-form-input id="form-address-edit-input"
+                        type="text"
+                        v-model="editForm.address"
+                        required
+                        placeholder="123 Pleasant St., Morgantown WV 26505">
+          </b-form-input>
+        </b-form-group>
+
         <b-form-group id="form-request-edit-group"
                     label="Title:"
                     label-for="form-request-edit-input">
@@ -113,17 +177,6 @@
                         required
                         placeholder="Enter request">
           </b-form-input>
-        </b-form-group>
-
-        <b-form-group id="form-parentGuardian-edit-group"
-                      label="Author:"
-                      label-for="form-parentGuardian-edit-input">
-            <b-form-input id="form-parentGuardian-edit-input"
-                          type="text"
-                          v-model="editForm.parentGuardian"
-                          required
-                          placeholder="Enter parentGuardian">
-            </b-form-input>
         </b-form-group>
 
         <b-form-group id="form-needHelp-edit-group">
@@ -150,14 +203,19 @@
 <script>
 import axios from 'axios';
 import Alert from './Alert.vue';
+import RequestMap from './Map.vue';
 
 export default {
   data() {
     return {
       requests: [],
       addRequestForm: {
+        name: '',
+        email: '',
+        address: '',
+        lat: 0,
+        long: 0,
         request: '',
-        parentGuardian: '',
         needHelp: [],
         canHelp: [],
       },
@@ -165,8 +223,12 @@ export default {
       showMessage: false,
       editForm: {
         id: '',
+        name: '',
+        email: '',
+        address: '',
+        lat: 0,
+        long: 0,
         request: '',
-        parentGuardian: '',
         needHelp: [],
         canHelp: [],
       },
@@ -174,6 +236,7 @@ export default {
   },
   components: {
     alert: Alert,
+    rmap: RequestMap,
   },
   methods: {
     getRequests() {
@@ -187,7 +250,7 @@ export default {
           console.error(error);
         });
     },
-    addRequest(payload) {
+    addRequest(payload) { // actually posts data to db
       const path = 'http://172.21.14.152:5000/requests';
       axios.post(path, payload)
         .then(() => {
@@ -202,31 +265,60 @@ export default {
         });
     },
     initForm() {
+      this.addRequestForm.name = '';
+      this.addRequestForm.email = '';
+      this.addRequestForm.address = '';
       this.addRequestForm.request = '';
-      this.addRequestForm.parentGuardian = '';
       this.addRequestForm.needHelp = [];
       this.addRequestForm.canHelp = [];
       this.editForm.id = '';
+      this.editForm.name = '';
+      this.editForm.email = '';
+      this.editForm.address = '';
       this.editForm.request = '';
-      this.editForm.parentGuardian = '';
       this.editForm.needHelp = [];
       this.editForm.canHelp = [];
     },
-    onSubmit(evt) {
+    onSubmit(evt) { // when you click submit of new request form
       evt.preventDefault();
       this.$refs.addRequestModal.hide();
       let needHelp = false;
       if (this.addRequestForm.needHelp[0]) needHelp = true;
       let canHelp = false;
       if (this.addRequestForm.canHelp[0]) canHelp = true;
-      const payload = {
-        request: this.addRequestForm.request,
-        parentGuardian: this.addRequestForm.parentGuardian,
-        needHelp, // property shorthand
-        canHelp,
-      };
-      this.addRequest(payload);
-      this.initForm();
+
+      const geocode = new Promise((resolve, reject) => {
+        // code here
+        // const latLongs = { lat: 0, long: 0 };
+        const latLongs = this.$refs.ourmap.test();
+        // const latLongs = this.$refs.ourmap.geocodeAddress(this.addRequestForm);
+        console.log(latLongs);
+        if (latLongs) {
+          resolve(latLongs);
+        } else {
+          reject(new Error('error'));
+        }
+      });
+
+      geocode
+        .then((response) => {
+          console.log(response);
+          const payload = {
+            name: this.addRequestForm.name,
+            email: this.addRequestForm.email,
+            address: this.addRequestForm.address,
+            lat: response.lat,
+            long: response.long,
+            request: this.addRequestForm.request,
+            needHelp, // property shorthand
+            canHelp,
+          };
+          this.addRequest(payload);
+          this.initForm();
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     },
     onReset(evt) {
       evt.preventDefault();
@@ -244,8 +336,10 @@ export default {
       let canHelp = false;
       if (this.editForm.canHelp[0]) canHelp = true;
       const payload = {
+        name: this.editForm.name,
+        email: this.editForm.email,
+        address: this.editForm.address,
         request: this.editForm.request,
-        parentGuardian: this.editForm.parentGuardian,
         needHelp,
         canHelp,
       };
@@ -287,6 +381,7 @@ export default {
     },
     onDeleteRequest(request) {
       this.removeRequest(request.id);
+      this.$refs.ourmap.updateMap();
     },
   },
   created() {

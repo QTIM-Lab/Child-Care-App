@@ -5,8 +5,9 @@ import App from './App.vue';
 import router from './router';
 
 Vue.use(BootstrapVue);
-
 Vue.config.productionTip = false;
+
+window.EventBus = new Vue();
 
 new Vue({
   router,
