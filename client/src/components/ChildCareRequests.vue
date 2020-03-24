@@ -1,11 +1,20 @@
 <template>
-  <div class="container">
+  <div>
     <div class="row">
       <div class="col-sm-10">
         <h1>Help Requests</h1>
+        <p>Please use this requests system to add availability
+          to help others or if you yourself need assistance.</p>
         <hr>
+        <p><i>Refresh browser to see changes reflected on map.</i></p>
         <br>
-        <rmap v-bind:requests="requests" ref="ourmap"></rmap>
+        <!-- <rmap v-bind:requests="requests" ref="ourmap" v-on:></rmap> -->
+        <div class=container>
+                <!-- <div id="floating-panel">
+                    <button @click="updateMap" id="submit">Refresh Map</button>
+                </div> -->
+                <div id="map"></div>
+        </div>
         <br>
         <alert :message=message v-if="showMessage"></alert>
         <button type="button"
@@ -203,18 +212,22 @@
 <script>
 import axios from 'axios';
 import Alert from './Alert.vue';
-import RequestMap from './Map.vue';
+// import RequestMap from './Map.vue';
+import gmapsInit from '../utils/gmaps';
 
 export default {
   data() {
     return {
+      lat: '',
+      lng: '',
+      google: '',
+      geocoder: '',
+      map: '',
       requests: [],
       addRequestForm: {
         name: '',
         email: '',
         address: '',
-        lat: 0,
-        long: 0,
         request: '',
         needHelp: [],
         canHelp: [],
@@ -226,17 +239,25 @@ export default {
         name: '',
         email: '',
         address: '',
-        lat: 0,
-        long: 0,
         request: '',
         needHelp: [],
         canHelp: [],
       },
     };
   },
+  async mounted() {
+    this.google = await gmapsInit();
+    this.geocoder = new this.google.maps.Geocoder();
+    this.map = new this.google.maps.Map(document.getElementById('map'), {
+      zoom: 12,
+      center: { lat: 42.3601, lng: -71.0589 },
+    });
+    // this.updateMap(this.requests);
+    this.updateMap();
+  },
   components: {
     alert: Alert,
-    rmap: RequestMap,
+    // rmap: RequestMap,
   },
   methods: {
     getRequests() {
@@ -244,6 +265,8 @@ export default {
       axios.get(path)
         .then((res) => {
           this.requests = res.data.requests;
+          this.updateMap();
+          // this.updateMap(this.requests);
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -279,6 +302,59 @@ export default {
       this.editForm.needHelp = [];
       this.editForm.canHelp = [];
     },
+    geocodeAddress(request, fn) {
+      // return { lat: 5, long: 5 };
+      // const street = document.getElementById('address').value;
+      const street = request.address;
+      this.geocoder.geocode({ address: street }, (results) => {
+        // console.log(typeof(this));
+        // console.log(results[0].geometry.location.lat());
+        // console.log(results[0].geometry.location.lng());
+        const test = {
+          lat: results[0].geometry.location.lat(),
+          long: results[0].geometry.location.lng(),
+        };
+        // if (status === 'OK') {
+        //   const [result] = results;
+        //   const { lat, lng } = result.geometry.location;
+        //   return { lat, lng };
+        // }
+        // return { lat: -1, lng: -1 };
+        // alert(`Geocode was not successful for the following reason: ${status}`);
+        fn(test);
+      });
+    },
+    removeAllMarkers() {
+      this.map.data.forEach((feature) => {
+        if (feature.getGeometry().getType() === 'Point') {
+          this.map.data.remove(feature);
+        }
+      });
+    },
+    updateMap() {
+      this.removeAllMarkers();
+      this.requests.forEach((request) => {
+        // this.geocodeAddress(request);
+        // this.map.setCenter({ lat: 42.3601, lng: -71.0589 });
+        // this.map.setZoom(12);
+        // Info window content
+        const contentString = `<h3>${request.name}</h3><hr><br><p>${request.request}</p>`;
+        // Add info window
+        const infowindow = new this.google.maps.InfoWindow({
+          content: contentString,
+          maxWidth: 200,
+        });
+        // Adding markers
+        const marker = new this.google.maps.Marker({
+          map: this.map,
+          position: { lat: request.lat, lng: request.long },
+          icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
+        });
+        marker.addListener('click', () => {
+          infowindow.open(this.map, marker);
+        });
+      });
+    },
     onSubmit(evt) { // when you click submit of new request form
       evt.preventDefault();
       this.$refs.addRequestModal.hide();
@@ -286,39 +362,20 @@ export default {
       if (this.addRequestForm.needHelp[0]) needHelp = true;
       let canHelp = false;
       if (this.addRequestForm.canHelp[0]) canHelp = true;
-
-      const geocode = new Promise((resolve, reject) => {
-        // code here
-        // const latLongs = { lat: 0, long: 0 };
-        const latLongs = this.$refs.ourmap.test();
-        // const latLongs = this.$refs.ourmap.geocodeAddress(this.addRequestForm);
-        console.log(latLongs);
-        if (latLongs) {
-          resolve(latLongs);
-        } else {
-          reject(new Error('error'));
-        }
+      this.geocodeAddress(this.addRequestForm, (test) => {
+        const payload = {
+          name: this.addRequestForm.name,
+          email: this.addRequestForm.email,
+          address: this.addRequestForm.address,
+          lat: test.lat,
+          long: test.long,
+          request: this.addRequestForm.request,
+          needHelp, // property shorthand
+          canHelp,
+        };
+        this.addRequest(payload);
+        this.initForm();
       });
-
-      geocode
-        .then((response) => {
-          console.log(response);
-          const payload = {
-            name: this.addRequestForm.name,
-            email: this.addRequestForm.email,
-            address: this.addRequestForm.address,
-            lat: response.lat,
-            long: response.long,
-            request: this.addRequestForm.request,
-            needHelp, // property shorthand
-            canHelp,
-          };
-          this.addRequest(payload);
-          this.initForm();
-        })
-        .catch((err) => {
-          console.error(err);
-        });
     },
     onReset(evt) {
       evt.preventDefault();
@@ -335,15 +392,28 @@ export default {
       if (this.editForm.needHelp[0]) needHelp = true;
       let canHelp = false;
       if (this.editForm.canHelp[0]) canHelp = true;
-      const payload = {
-        name: this.editForm.name,
-        email: this.editForm.email,
-        address: this.editForm.address,
-        request: this.editForm.request,
-        needHelp,
-        canHelp,
-      };
-      this.updateRequest(payload, this.editForm.id);
+      this.geocodeAddress(this.editForm, (test) => {
+        const payload = {
+          name: this.editForm.name,
+          email: this.editForm.email,
+          address: this.editForm.address,
+          lat: test.lat,
+          long: test.long,
+          request: this.editForm.request,
+          needHelp, // property shorthand
+          canHelp,
+        };
+        this.updateRequest(payload, this.editForm.id);
+      });
+      // const payload = {
+      //   name: this.editForm.name,
+      //   email: this.editForm.email,
+      //   address: this.editForm.address,
+      //   request: this.editForm.request,
+      //   needHelp,
+      //   canHelp,
+      // };
+      // this.updateRequest(payload, this.editForm.id);
     },
     updateRequest(payload, requestID) {
       const path = `http://172.21.14.152:5000/requests/${requestID}`;
@@ -381,7 +451,6 @@ export default {
     },
     onDeleteRequest(request) {
       this.removeRequest(request.id);
-      this.$refs.ourmap.updateMap();
     },
   },
   created() {
@@ -389,3 +458,34 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  /* Always set the map height explicitly to define the size of the div
+  * element that contains the map. */
+  .container {
+      height: 800px;
+      width: 1000px;
+  }
+  #map {
+  height: 100%;
+  }
+  /* Optional: Makes the sample page fill the window. */
+  html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  }
+  #floating-panel {
+  position: absolute;
+  top: 10px;
+  left: 25%;
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+  text-align: center;
+  font-family: 'Roboto','sans-serif';
+  line-height: 30px;
+  padding-left: 10px;
+  }
+</style>

@@ -1,15 +1,14 @@
 <template>
   <div>
     <b-navbar toggleable="lg" type="dark" variant="info">
-      <b-navbar-brand href="https://www.martinos.org/">Martinos</b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item
-            href="/ChildCareAssistance.pdf">Child Care Support Details
-          </b-nav-item>
+          <b-navbar-brand>
+            <a href="/New_Resources.pdf" style="color: white;">Link to Resources</a>
+          </b-navbar-brand>
           <!-- <b-nav-item href="#" disabled>Disabled</b-nav-item> -->
         </b-navbar-nav>
         <!-- <b-navbar-nav class="ml-auto">

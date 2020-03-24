@@ -16,38 +16,39 @@ export default {
   data() {
     return {
       google: '',
-      geocoder: '',
+      // geocoder: '',
       map: '',
     };
   },
   props: ['requests'],
   async mounted() {
     this.google = await gmapsInit();
-    // console.log(AM_I_AVAILABLE);
-    this.geocoder = new this.google.maps.Geocoder();
+    // this.geocoder = new this.google.maps.Geocoder();
     // Init Map
     this.map = new this.google.maps.Map(document.getElementById('map'), {
       zoom: 12,
       center: { lat: 42.3601, lng: -71.0589 },
     });
-    this.updateMap();
+    this.updateMap(this.requests, (variable) => {
+      console.log(variable);
+    });
   },
   methods: {
-    geocodeAddress(request) {
-      // const street = document.getElementById('address').value;
-      const street = request.address;
-      this.geocoder.geocode({ address: street }, (results, status) => {
-        if (status === 'OK') {
-          const [result] = results;
-          const { lat, lng } = result.geometry.location;
-          return { lat, lng };
-        }
-        return { lat: -1, lng: -1 };
-        // alert(`Geocode was not successful for the following reason: ${status}`);
-      });
-    },
-    updateMap() {
-      this.requests.forEach((request) => {
+    // test(request) {
+    //   // const street = document.getElementById('address').value;
+    //   const street = request.address;
+    //   this.geocoder.geocode({ address: street }, (results, status) => {
+    //     if (status === 'OK') {
+    //       const [result] = results;
+    //       const { lat, lng } = result.geometry.location;
+    //       return { lat, lng };
+    //     }
+    //     return { lat: -1, lng: -1 };
+    //     // alert(`Geocode was not successful for the following reason: ${status}`);
+    //   });
+    // },
+    updateMap(requests) {
+      requests.forEach((request) => {
         // this.geocodeAddress(request);
         this.map.setCenter({ lat: 42.3601, lng: -71.0589 });
         this.map.setZoom(12);
@@ -67,9 +68,6 @@ export default {
           infowindow.open(this.map, marker);
         });
       });
-    },
-    test() {
-      return { lat: 5, long: 5 };
     },
   },
 };
