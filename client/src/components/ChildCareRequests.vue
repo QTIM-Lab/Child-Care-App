@@ -29,6 +29,7 @@
               <th scope="col">Email</th>
               <th scope="col">Address</th>
               <th scope="col">Request/Service</th>
+              <th scope="col">Request Type</th>
               <th scope="col">Need Help?</th>
               <th scope="col">Can Help?</th>
               <th></th>
@@ -40,6 +41,11 @@
               <td>{{ request.email }}</td>
               <td>{{ request.address }}</td>
               <td>{{ request.request }}</td>
+              <td>
+                {{ request.requestType === 'inHouseHelp' ? 'In House Help' : '' }}
+                {{ request.requestType === 'transportation' ? 'Transportation' : '' }}
+                {{ request.requestType === 'shopping' ? 'Shopping' : '' }}
+              </td>
               <td>
                 <span v-if="request.needHelp">Yes</span>
                 <span v-else>No</span>
@@ -130,7 +136,15 @@
             <b-form-checkbox value="true">Can Help?</b-form-checkbox>
           </b-form-checkbox-group>
         </b-form-group>
-
+<!-- New Request Type -->
+        <b-form-group label="What kind of request is this?">
+          <b-form-radio-group id="radio-group-2" v-model="addRequestForm.requestType" name="name">
+            <b-form-radio value="transportation">Transportation</b-form-radio>
+            <b-form-radio value="shopping">Shopping</b-form-radio>
+            <b-form-radio value="inHouseHelp">In House Help</b-form-radio>
+          </b-form-radio-group>
+        </b-form-group>
+        <div class="mt-3">Selected: {{ addRadios }}</div>
         <b-button-group>
           <b-button type="submit" variant="primary">Submit</b-button>
           <b-button type="reset" variant="danger">Reset</b-button>
@@ -199,6 +213,15 @@
             <b-form-checkbox value="true">Can help?</b-form-checkbox>
           </b-form-checkbox-group>
         </b-form-group>
+<!-- New Request Type -->
+        <b-form-group label="What kind of request is this?">
+          <b-form-radio-group id="radio-group-2" v-model="editForm.requestType" name="flavour-2">
+            <b-form-radio value="transportation">Transportation</b-form-radio>
+            <b-form-radio value="shopping">Shopping</b-form-radio>
+            <b-form-radio value="inHouseHelp">In House Help</b-form-radio>
+          </b-form-radio-group>
+        </b-form-group>
+       <div class="mt-3">Selected: {{ updateRadios }}</div>
 
         <b-button-group>
           <b-button type="submit" variant="primary">Update</b-button>
@@ -218,6 +241,11 @@ import gmapsInit from '../utils/gmaps';
 export default {
   data() {
     return {
+      iconMap: {
+        transportation: 'car-icon.png',
+        inHouseHelp: 'baby-icon.png',
+        shopping: 'shopping-cart-icon.png',
+      },
       lat: '',
       lng: '',
       google: '',
@@ -229,8 +257,9 @@ export default {
         email: '',
         address: '',
         request: '',
-        needHelp: [],
-        canHelp: [],
+        requestType: '',
+        needHelp: false,
+        canHelp: false,
       },
       message: '',
       showMessage: false,
@@ -240,8 +269,9 @@ export default {
         email: '',
         address: '',
         request: '',
-        needHelp: [],
-        canHelp: [],
+        requestType: '',
+        needHelp: false,
+        canHelp: false,
       },
     };
   },
@@ -292,15 +322,17 @@ export default {
       this.addRequestForm.email = '';
       this.addRequestForm.address = '';
       this.addRequestForm.request = '';
-      this.addRequestForm.needHelp = [];
-      this.addRequestForm.canHelp = [];
+      this.addRequestForm.requestType = '';
+      this.addRequestForm.needHelp = false;
+      this.addRequestForm.canHelp = false;
       this.editForm.id = '';
       this.editForm.name = '';
       this.editForm.email = '';
       this.editForm.address = '';
       this.editForm.request = '';
-      this.editForm.needHelp = [];
-      this.editForm.canHelp = [];
+      this.editForm.requestType = '';
+      this.editForm.needHelp = false;
+      this.editForm.canHelp = false;
     },
     geocodeAddress(request, fn) {
       // return { lat: 5, long: 5 };
@@ -348,7 +380,7 @@ export default {
         const marker = new this.google.maps.Marker({
           map: this.map,
           position: { lat: request.lat, lng: request.long },
-          icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
+          icon: '/' + this.iconMap[request.requestType],
         });
         marker.addListener('click', () => {
           infowindow.open(this.map, marker);
@@ -358,10 +390,6 @@ export default {
     onSubmit(evt) { // when you click submit of new request form
       evt.preventDefault();
       this.$refs.addRequestModal.hide();
-      let needHelp = false;
-      if (this.addRequestForm.needHelp[0]) needHelp = true;
-      let canHelp = false;
-      if (this.addRequestForm.canHelp[0]) canHelp = true;
       this.geocodeAddress(this.addRequestForm, (test) => {
         const payload = {
           name: this.addRequestForm.name,
@@ -370,8 +398,9 @@ export default {
           lat: test.lat,
           long: test.long,
           request: this.addRequestForm.request,
-          needHelp, // property shorthand
-          canHelp,
+          requestType: this.addRequestForm.requestType,
+          needHelp: this.addRequestForm.needHelp,
+          canHelp: this.addRequestForm.canHelp,
         };
         this.addRequest(payload);
         this.initForm();
@@ -388,10 +417,6 @@ export default {
     onSubmitUpdate(evt) {
       evt.preventDefault();
       this.$refs.editRequestModal.hide();
-      let needHelp = false;
-      if (this.editForm.needHelp[0]) needHelp = true;
-      let canHelp = false;
-      if (this.editForm.canHelp[0]) canHelp = true;
       this.geocodeAddress(this.editForm, (test) => {
         const payload = {
           name: this.editForm.name,
@@ -400,8 +425,9 @@ export default {
           lat: test.lat,
           long: test.long,
           request: this.editForm.request,
-          needHelp, // property shorthand
-          canHelp,
+          requestType: this.editForm.requestType,
+          needHelp: this.editForm.needHelp,
+          canHelp: this.editForm.canHelp,
         };
         this.updateRequest(payload, this.editForm.id);
       });

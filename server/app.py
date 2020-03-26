@@ -2,7 +2,7 @@
 import uuid
 
 # Flask
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 
 # DB
@@ -13,6 +13,7 @@ DEBUG = True
 
 # instantiate the app
 app = Flask(__name__)
+app.secret_key = b'secret_key_for_session_management' # for sessions
 app.config.from_object(__name__)
 
 # enable CORS
@@ -36,6 +37,7 @@ def all_requests():
             'lat': post_data.get('lat'),
             'long': post_data.get('long'),
             'request': post_data.get('request'),
+            'requestType': post_data.get('requestType'),
             'needHelp': post_data.get('needHelp'),
             'canHelp': post_data.get('canHelp')
         })
@@ -43,6 +45,37 @@ def all_requests():
     else:
         response_object['requests'] = db.all()
     return jsonify(response_object)
+
+# Login
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        response_object = {'status': 'POST'}
+        post_data = request.get_json()
+        # Check if user exists in db
+        User = Query()
+        user = db.search(User.email == post_data.get('email'))
+        response_object = {'status': 'POST', 'isUsr':False}
+        print("""
+        email: {}
+        passwd: {}
+        """.format(post_data.get('email'), post_data.get('password')))
+        if len(user) != 0:
+            response_object['isUsr'] = True;
+
+    elif request.method == 'GET':
+        response_object = {'status': 'GET'}
+    else:
+        response_object = {'status': 'Something Else...'}
+
+    return jsonify(response_object)
+
+
+
+
+
+
+
 
 # Delete\Update api handler
 @app.route('/requests/<request_id>', methods=['PUT', 'DELETE'])
@@ -58,6 +91,7 @@ def single_request(request_id):
         print("lat: {}".format(post_data.get('lat')))
         print("long: {}".format(post_data.get('long')))
         print("request: {}".format(post_data.get('request')))
+        print("requestType: {}".format(post_data.get('requestType')))
         print("needHelp: {}".format(post_data.get('needHelp')))
         print("canHelp: {}".format(post_data.get('canHelp')))
         db.insert({
@@ -68,6 +102,7 @@ def single_request(request_id):
             'lat': post_data.get('lat'),
             'long': post_data.get('long'),
             'request': post_data.get('request'),
+            'requestType': post_data.get('requestType'),
             'needHelp': post_data.get('needHelp'),
             'canHelp': post_data.get('canHelp')
         })
@@ -108,6 +143,7 @@ def recreate_db():
             'lat': 42.341590,
             'long': -71.097740,
             'request': 'Lack of diapers in my area, can anyone help?',
+            'requestType': 'shopping',
             'needHelp': False,
             'canHelp': False,
         },
@@ -119,6 +155,7 @@ def recreate_db():
             'lat': 42.358960,
             'long': -71.135920,
             'request': 'Can someone watch my kid from 2-3pm tomorrow?',
+            'requestType': 'inHouseHelp',
             'needHelp': False,
             'canHelp': False
 
@@ -131,6 +168,7 @@ def recreate_db():
             'lat': 42.349420,
             'long': -71.132920,
             'request': 'I need a baby sitter this Friday (3/20/2020) from 1-2pm/ Is anyone available?',
+            'requestType': 'inHouseHelp',
             'needHelp': False,
             'canHelp': False
         }
