@@ -242,9 +242,9 @@ export default {
   data() {
     return {
       iconMap: {
-        transportation: 'car-icon.png',
-        inHouseHelp: 'baby-icon.png',
-        shopping: 'shopping-cart-icon.png',
+        transportation: 'transportation.png',
+        inHouseHelp: 'inHouseHelp.png',
+        shopping: 'shopping.png',
       },
       lat: '',
       lng: '',

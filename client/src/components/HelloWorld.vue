@@ -7,7 +7,7 @@
     <br>
     <ChildCareRequests></ChildCareRequests>
     <br>
-    <div class="row">
+    <!-- <div class="row">
       <h1>MGH Community Help</h1>
       <iframe src="https://www.google.com/maps/d/u/1/embed?mid=1JsA5_X7Kk0ejNZvo1hOJPRL9bPnCq_eh" width="100%" height="480"></iframe>
       <p>Edit this map
@@ -15,9 +15,9 @@
         here
         </a>
       </p>
-    </div>
+    </div> -->
     <br>
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc607Obx7cgTqDECsR9wO280rucBdnyCH_PibUeLrVh2CPRmg/viewform?embedded=true" width="640" height="1517" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+    <!-- <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc607Obx7cgTqDECsR9wO280rucBdnyCH_PibUeLrVh2CPRmg/viewform?embedded=true" width="640" height="1517" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe> -->
     <br>
     <br>
     <br>
